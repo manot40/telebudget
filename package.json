@@ -3,6 +3,7 @@
   "name": "telebudget",
   "module": "src/index.ts",
   "license": "MIT",
+  "version": "0.0.0",
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun dist/index.js",
@@ -16,9 +17,9 @@
   },
   "devDependencies": {
     "@grammyjs/menu": "^1.2.1",
+    "@libsql/client": "^0.6.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/bun": "latest",
-    "better-sqlite3": "^9.4.5",
     "drizzle-kit": "^0.20.14",
     "drizzle-orm": "^0.30.7",
     "hono": "^4.2.2",

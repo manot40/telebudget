@@ -2,7 +2,7 @@ import type { Config } from 'drizzle-kit';
 
 export default {
   out: './drizzle',
-  driver: 'better-sqlite',
+  driver: 'libsql',
   schema: './src/db/schema.ts',
-  dbCredentials: { url: '.data/sqlite.db' },
+  dbCredentials: { url: 'file:.data/sqlite.db' },
 } satisfies Config;

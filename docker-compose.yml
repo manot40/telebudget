@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  bot:
+    restart: unless-stopped
+    env_file: ./.env
+    container_name: telebudget
+
+    build:
+      context: ./
+    ports:
+      - '8011:8000'
+    volumes:
+      - ./.data:/usr/app/.data
