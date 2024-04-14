@@ -1,3 +1,4 @@
+import loadMarkdown from '~/utils/load-markdown';
 import bot from '.';
 
 // Interactive Menus
@@ -15,7 +16,7 @@ bot.on('edited_message', async (ctx) => {
   if (!exist) return;
 
   ctx.session.cachedChat = edited;
-  const msg =
-    'You just modified a message containing past transaction.\n\nDo you want to update related transaction?';
-  return ctx.reply(msg, { reply_markup: confirmEdit });
+  return ctx.reply(CONFIRM_EDIT, { reply_markup: confirmEdit });
 });
+
+const CONFIRM_EDIT = await loadMarkdown('confirm-edit');

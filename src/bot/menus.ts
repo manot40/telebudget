@@ -20,9 +20,8 @@ export const confirmEdit = new Menu<BotContext>('confirm-edit-menu')
       await db
         .update(transaction$)
         .set({ ...values, updatedAt: new Date() })
-        .where(and(eq(transaction$.userId, user.id), eq(transaction$.chatId, msg.message_id)))
-        .returning();
-      ctx.editMessageText('Transaction updated!');
+        .where(and(eq(transaction$.userId, user.id), eq(transaction$.chatId, msg.message_id)));
+      ctx.editMessageText('Transaction updated successfully');
     } catch (e) {
       console.error(e);
       ctx.editMessageText('Failed to update. Unknown Error');

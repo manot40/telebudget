@@ -2,29 +2,29 @@ import bot from '.';
 
 // Databases
 import db from '~/db';
+import { and, eq } from 'drizzle-orm';
 import { transaction$ } from '~/db/schema';
 
 // Services
-import { parseTransaction } from '~/services/transaction';
+import { parseTransaction, transactionExist } from '~/services/transaction';
 
-bot.command('help', async (ctx) => {
-  return ctx.reply('Help message');
-});
+// Utilities
+import loadMarkdown from '~/utils/load-markdown';
 
-bot.command('start', async (ctx) => {
+bot.command('help', (ctx) => ctx.replyWithMarkdownV2(HELP));
+
+bot.command('start', (ctx) => {
   const user = ctx.session.user;
-  return ctx.reply(`Welcome, ${user.fullname}\n\n Type /help to see available commands.`);
+  if (user) return ctx.reply(`Welcome, ${user.fullname}\n\n Type /help to see available commands.`);
 });
-
-bot.command('settings', async (ctx) => {});
 
 bot.command(['add', 'a'], async (ctx) => {
   const msg = ctx.message;
   const user = ctx.session.user;
-  if (!msg) return ctx.reply(`Invalid format provided.${ADD_FORMAT}`);
+  if (!msg) return ctx.reply(`Invalid format provided.\n\n${HELP_ADD}`);
 
   const { values, error } = await parseTransaction(msg, user);
-  if (!values || error) return ctx.reply(error);
+  if (!values || error) return ctx.replyWithMarkdownV2(`${error}\n\n${HELP_ADD}`);
 
   try {
     await db.insert(transaction$).values(values).returning();
@@ -35,13 +35,54 @@ bot.command(['add', 'a'], async (ctx) => {
   }
 });
 
-/* Invalid Messages */
-const ADD_FORMAT = `
-**Accepted format**:
-/add (alias: /a) <amount> [(tag|t):<name>] [type:<income|expense>] ["<note>"]
+bot.command(['edit', 'e'], async (ctx) => {
+  const msg = ctx.message,
+    user = ctx.session.user,
+    replyMsg = msg?.reply_to_message;
 
-**Example**:
-/add 5rb
-/add 10rb tag:food
-/add 5jt type:income t:salary "Received salary from company"
-` as const;
+  if (!msg) return ctx.replyWithMarkdownV2(`Invalid format provided\n\n${HELP_ADD}`);
+  if (!replyMsg) return ctx.reply('Past transaction must be replied to');
+
+  const exist = await transactionExist({ chatId: replyMsg.message_id, userId: user.id });
+  if (!exist) return ctx.reply('Transaction not found');
+
+  const { values, error } = await parseTransaction(msg, user);
+  if (!values || error) return ctx.replyWithMarkdownV2(`${error}\n\n${HELP_ADD}`);
+  values.chatId = replyMsg.message_id;
+
+  try {
+    await db
+      .update(transaction$)
+      .set({ ...values, updatedAt: new Date() })
+      .where(and(eq(transaction$.userId, user.id), eq(transaction$.chatId, replyMsg.message_id)));
+    return ctx.reply('Transaction modified successfully');
+  } catch (err) {
+    console.error(err);
+    return ctx.reply('Failed to modify transaction');
+  }
+});
+
+bot.command(['delete', 'd'], async (ctx) => {
+  const msg = ctx.message,
+    user = ctx.session.user,
+    id = msg?.text.split(' ')[1],
+    replyMsg = msg?.reply_to_message;
+
+  if (!replyMsg && !id) return ctx.reply('Either provide transaction id or quote past transaction chat');
+
+  const exist = await transactionExist(id ? { id } : { chatId: replyMsg!.message_id, userId: user.id });
+  if (!exist) return ctx.reply('Transaction not found');
+
+  try {
+    await db
+      .delete(transaction$)
+      .where(id ? eq(transaction$.id, id) : eq(transaction$.chatId, replyMsg!.message_id));
+    return ctx.reply('Transaction deleted successfully');
+  } catch (err) {
+    console.error(err);
+    return ctx.reply('Failed to delete transaction');
+  }
+});
+
+const HELP = await loadMarkdown('help');
+const HELP_ADD = await loadMarkdown('help-add');

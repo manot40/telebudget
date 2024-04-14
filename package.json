@@ -10,13 +10,16 @@
     "build": "bun build.ts",
     "db:push": "drizzle-kit push:sqlite",
     "db:pull": "drizzle-kit introspect:sqlite",
-    "db:generate": "drizzle-kit generate:sqlite"
+    "db:generate": "drizzle-kit generate:sqlite",
+    "prettier:write": "prettier --write ."
   },
   "dependencies": {
     "grammy": "^1.22.4"
   },
   "devDependencies": {
+    "@grammyjs/hydrate": "^1.4.1",
     "@grammyjs/menu": "^1.2.1",
+    "@grammyjs/parse-mode": "^1.9.0",
     "@libsql/client": "^0.6.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/bun": "latest",
