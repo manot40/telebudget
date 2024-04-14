@@ -16,6 +16,7 @@ ENV NODE_ENV production
 COPY --from=build /usr/app/dist /usr/app/dist
 COPY --from=build /usr/app/bun.lockb /usr/app/bun.lockb
 COPY --from=build /usr/app/package.json /usr/app/package.json
+COPY --from=build /usr/app/src/templates /usr/app/src/templates
 
 RUN bun install --production
 
