@@ -4,7 +4,7 @@ import bot from '.';
 import { confirmEdit } from './menus';
 
 // Utilities
-import loadMarkdown from '~/utils/load-markdown';
+import loadTemplate from '~/utils/load-template';
 
 // Services
 import { transactionExist } from '~/services/transaction';
@@ -18,7 +18,7 @@ bot.on('edited_message', async (ctx) => {
   if (!exist) return;
 
   ctx.session.cachedChat = edited;
-  return ctx.replyWithMarkdownV2(CONFIRM_EDIT, { reply_markup: confirmEdit });
+  return ctx.replyWithHTML(CONFIRM_EDIT, { reply_markup: confirmEdit });
 });
 
-const CONFIRM_EDIT = await loadMarkdown('confirm-edit');
+const CONFIRM_EDIT = await loadTemplate('confirm-edit');

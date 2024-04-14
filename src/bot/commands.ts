@@ -5,29 +5,36 @@ import { and, eq } from 'drizzle-orm';
 import { transaction$ } from '~/db/schema';
 
 // Services
+import { getQuickSummary } from '~/services/reporting';
 import { parseTransaction, transactionExist } from '~/services/transaction';
 
 // Utilities
-import loadMarkdown from '~/utils/load-markdown';
+import loadTemplate from '~/utils/load-template';
 
-bot.command('help', (ctx) => ctx.replyWithMarkdownV2(HELP));
+bot.command('help', (ctx) => ctx.replyWithHTML(HELP));
 
 bot.command('start', (ctx) => {
   const user = ctx.session.user;
   if (user) return ctx.reply(`Welcome, ${user.fullname}\n\n Type /help to see available commands.`);
 });
 
-bot.command(['add', 'a'], async (ctx) => {
+bot.command(['add', 'a', '@'], async (ctx) => {
   const msg = ctx.message;
   const user = ctx.session.user;
   if (!msg) return ctx.reply(`Invalid format provided.\n\n${HELP_ADD}`);
 
   const { values, error } = await parseTransaction(msg, user);
-  if (!values || error) return ctx.replyWithMarkdownV2(`${error}\n\n${HELP_ADD}`);
+  if (!values || error) return ctx.replyWithHTML(`${error}\n\n${HELP_ADD}`);
 
   try {
-    await db.insert(transaction$).values(values).returning();
-    return ctx.reply('Transaction added successfully');
+    const result = await db.transaction(async (tx) => {
+      const [data] = await tx.insert(transaction$).values(values).returning();
+      const sum = await getQuickSummary(user, tx);
+      return { ...sum, id: data.id };
+    });
+
+    const template = await loadTemplate('success-add', result);
+    return ctx.replyWithHTML(template);
   } catch (err) {
     console.error(err);
     return ctx.reply('Failed to add transaction');
@@ -39,14 +46,14 @@ bot.command(['edit', 'e'], async (ctx) => {
     user = ctx.session.user,
     replyMsg = msg?.reply_to_message;
 
-  if (!msg) return ctx.replyWithMarkdownV2(`Invalid format provided\n\n${HELP_ADD}`);
+  if (!msg) return ctx.replyWithHTML(`Invalid format provided\n\n${HELP_ADD}`);
   if (!replyMsg) return ctx.reply('Past transaction must be replied to');
 
   const exist = await transactionExist({ chatId: replyMsg.message_id, userId: user.id });
   if (!exist) return ctx.reply('Transaction not found');
 
   const { values, error } = await parseTransaction(msg, user);
-  if (!values || error) return ctx.replyWithMarkdownV2(`${error}\n\n${HELP_ADD}`);
+  if (!values || error) return ctx.replyWithHTML(`${error}\n\n${HELP_ADD}`);
   values.chatId = replyMsg.message_id;
 
   try {
@@ -76,12 +83,24 @@ bot.command(['delete', 'd'], async (ctx) => {
     await db
       .delete(transaction$)
       .where(id ? eq(transaction$.id, id) : eq(transaction$.chatId, replyMsg!.message_id));
-    return ctx.reply('Transaction deleted successfully');
+
+    if (replyMsg)
+      await Promise.allSettled([
+        ctx.api.deleteMessage(ctx.chat.id, replyMsg.message_id),
+        ctx.api.editMessageText(
+          ctx.chat.id,
+          replyMsg.message_id + 1,
+          `Transaction has been deleted\nwas: \`${replyMsg.text}\``,
+          { parse_mode: 'MarkdownV2' }
+        ),
+      ]);
+
+    return ctx.reply('Transaction deleted');
   } catch (err) {
     console.error(err);
     return ctx.reply('Failed to delete transaction');
   }
 });
 
-const HELP = await loadMarkdown('help');
-const HELP_ADD = await loadMarkdown('help-add');
+const HELP = await loadTemplate('help');
+const HELP_ADD = await loadTemplate('help-add');

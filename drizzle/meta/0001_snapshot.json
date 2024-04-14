@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "5987ca9e-3673-42d7-9d29-1d8501aba59f",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "aca3b911-502c-4105-b119-7b3c28627012",
+  "prevId": "c37bb6c8-5f5a-4b07-bc22-e1c6612a1e83",
   "tables": {
     "tlb_tags": {
       "name": "tlb_tags",
@@ -196,6 +196,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "settings": {
+          "name": "settings",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": {}
         },
         "fullname": {
           "name": "fullname",
