@@ -1,8 +1,10 @@
-import loadMarkdown from '~/utils/load-markdown';
 import bot from '.';
 
 // Interactive Menus
 import { confirmEdit } from './menus';
+
+// Utilities
+import loadMarkdown from '~/utils/load-markdown';
 
 // Services
 import { transactionExist } from '~/services/transaction';
@@ -16,7 +18,7 @@ bot.on('edited_message', async (ctx) => {
   if (!exist) return;
 
   ctx.session.cachedChat = edited;
-  return ctx.reply(CONFIRM_EDIT, { reply_markup: confirmEdit });
+  return ctx.replyWithMarkdownV2(CONFIRM_EDIT, { reply_markup: confirmEdit });
 });
 
 const CONFIRM_EDIT = await loadMarkdown('confirm-edit');

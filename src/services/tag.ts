@@ -1,5 +1,3 @@
-import db from '~/db';
-
 import { and, eq } from 'drizzle-orm';
 
 import { tag$, type Tag } from '~/db/schema/tag';

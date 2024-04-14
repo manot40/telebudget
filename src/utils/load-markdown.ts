@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises';
 
-/** Render markdown file relative to the `src/templates` directory into string. */
+/** Render markdown file relative to the `templates` directory into string. */
 export default async function loadMarkdown<T extends Object, N extends string>(name: N, data?: T) {
-  const path = `src/templates/${name}.md`;
+  const path = `templates/${name}.md`;
   const buffer = await readFile(path);
   let content = buffer.toString('utf-8');
 

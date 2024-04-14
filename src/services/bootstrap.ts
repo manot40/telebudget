@@ -1,6 +1,5 @@
 import type { User } from 'grammy/types';
 
-import db from '~/db';
 import { user$ } from '~/db/schema';
 
 export async function registerUser(user: User) {

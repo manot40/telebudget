@@ -1,3 +1,5 @@
+// THIS IMPORTS MUST BE IN ORDER
+import '~/db';
 import '~/bot/menus';
 import '~/bot/middlewares';
 import '~/bot/commands';
@@ -5,6 +7,7 @@ import '~/bot/messages';
 
 import bot, { useWebhook } from '~/bot';
 
+const PORT = import.meta.env.PORT || 8000;
 const MODE = (import.meta.env.MODE?.toLowerCase() || 'pull') as 'pull' | 'webhook';
 
 if (MODE === 'webhook') {
@@ -20,8 +23,11 @@ if (MODE === 'webhook') {
       return ctx.json({ error }, 500);
     });
 
-  Bun.serve({ port: import.meta.env.PORT || 8000, fetch: app.fetch });
+  console.info('[INFO] Starting bot in webhook mode');
+  Bun.serve({ port: PORT, fetch: app.fetch });
+  console.info('[INFO] Listening on port:', PORT);
 } else {
+  console.info('[INFO] Starting bot in pooling mode');
   bot.catch((e) => console.error(e));
   bot.start();
 }

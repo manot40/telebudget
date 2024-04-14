@@ -10,6 +10,7 @@
     "build": "bun build.ts",
     "db:push": "drizzle-kit push:sqlite",
     "db:pull": "drizzle-kit introspect:sqlite",
+    "db:studio": "drizzle-kit studio --port 8001",
     "db:generate": "drizzle-kit generate:sqlite",
     "prettier:write": "prettier --write ."
   },
@@ -23,6 +24,7 @@
     "@libsql/client": "^0.6.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/bun": "latest",
+    "dayjs": "^1.11.10",
     "drizzle-kit": "^0.20.14",
     "drizzle-orm": "^0.30.7",
     "hono": "^4.2.2",

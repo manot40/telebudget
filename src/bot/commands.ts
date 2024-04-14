@@ -1,7 +1,6 @@
 import bot from '.';
 
 // Databases
-import db from '~/db';
 import { and, eq } from 'drizzle-orm';
 import { transaction$ } from '~/db/schema';
 

@@ -2,7 +2,6 @@ import type { User } from '~/db/schema/user';
 import type { Message } from 'grammy/types';
 
 // Database
-import db from '~/db';
 import { eq, and, count } from 'drizzle-orm';
 // Schema
 import { transaction$ } from '~/db/schema';

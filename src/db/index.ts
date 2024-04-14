@@ -1,10 +1,12 @@
-import { drizzle } from 'drizzle-orm/bun-sqlite';
-import { Database } from 'bun:sqlite';
-
 import * as schema from './schema';
 
-const sqlite = new Database('.data/sqlite.db');
+import { Database } from 'bun:sqlite';
+import { drizzle, type BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite';
 
-const db = drizzle(sqlite, { schema });
+const sqlite = new Database(import.meta.env.DB_FILE || '.data/sqlite.db', { create: true });
 
-export default db;
+declare global {
+  var db: BunSQLiteDatabase<typeof schema>;
+}
+
+export const db = (global.db ??= drizzle(sqlite, { schema }));
