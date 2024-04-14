@@ -5,7 +5,7 @@ export function wordsToNumber(word: string) {
 
   const numberStr = numberWithUnit.match(numReg)?.[0]!;
   const unit = String(numberWithUnit).replace(numberStr, '') as Unit | '';
-  if (!UNIT.includes(unit as Unit)) return null;
+  if (unit !== '' && !UNIT.includes(unit)) return null;
 
   const number = parseFloat(numberStr);
   const multiplier = unit ? numberMap[unit] : 1;

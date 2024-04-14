@@ -6,7 +6,7 @@ async function main() {
 
   const result = await Bun.build({
     outdir: 'dist',
-    external: ['bun:*', 'node:*', 'grammy'],
+    external: ['bun:*', 'node:*', 'grammy', 'handlebars'],
     sourcemap: 'external',
     entrypoints: ['src/index.ts'],
   });

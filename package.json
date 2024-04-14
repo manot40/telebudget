@@ -15,7 +15,8 @@
     "prettier:write": "prettier --write ."
   },
   "dependencies": {
-    "grammy": "^1.22.4"
+    "grammy": "^1.22.4",
+    "handlebars": "^4.7.8"
   },
   "devDependencies": {
     "@grammyjs/hydrate": "^1.4.1",
