@@ -3,7 +3,7 @@ import type { User } from '~/db/schema/user';
 import dayjs from 'dayjs';
 
 import { transaction$ } from '~/db/schema';
-import { and, eq, gt, sum } from 'drizzle-orm';
+import { and, eq, gt, lte, sum } from 'drizzle-orm';
 
 const numFmt = new Intl.NumberFormat('id', { currency: 'IDR', style: 'currency', maximumFractionDigits: 0 })
   .format;
@@ -22,7 +22,8 @@ export async function getQuickSummary(user: User, tx = global.db) {
       and(
         eq(transaction$.userId, user.id),
         eq(transaction$.type, 'EXPENSE'),
-        gt(transaction$.createdAt, lastClosing.toDate())
+        gt(transaction$.createdAt, lastClosing.toDate()),
+        lte(transaction$.createdAt, lastClosing.add(1, 'month').toDate()),
       )
     );
 
