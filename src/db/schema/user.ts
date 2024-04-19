@@ -11,7 +11,7 @@ import { cuid, timestamp } from '../helper';
 export const user$ = sqliteTable('tlb_users', {
   id: cuid('id').primaryKey(),
   teleId: integer('telegram_id').unique('user_tele_id').notNull(),
-  settings: text('settings', { mode: 'json' }).$type<UserSetting>().notNull().default({}),
+  settings: text('settings', { mode: 'json' }).default('{}').$type<UserSetting>().notNull(),
   fullname: text('fullname').notNull(),
   username: text('username'),
   ...timestamp(),

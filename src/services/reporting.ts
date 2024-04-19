@@ -15,6 +15,8 @@ export async function getQuickSummary(user: User, tx = global.db) {
 
   if (lastClosing.isAfter(Date.now())) lastClosing = lastClosing.subtract(1, 'month');
 
+  const daysPassed = lastClosing.diff(dayjs(), 'day');
+
   const [expense] = await tx
     .select({ value: sum(transaction$.amount), id: transaction$.id })
     .from(transaction$)
@@ -23,13 +25,19 @@ export async function getQuickSummary(user: User, tx = global.db) {
         eq(transaction$.userId, user.id),
         eq(transaction$.type, 'EXPENSE'),
         gt(transaction$.createdAt, lastClosing.toDate()),
-        lte(transaction$.createdAt, lastClosing.add(1, 'month').toDate()),
+        lte(transaction$.createdAt, lastClosing.add(1, 'month').toDate())
       )
     );
 
-  expense.value &&= numFmt(+expense.value);
+  if (!expense.value) return null;
+
+  const average = (+expense.value / daysPassed) * -1;
 
   return {
-    expense: expense.value,
+    start: lastClosing.format('DD-MM-YYYY'),
+    end: lastClosing.add(1, 'month').format('DD-MM-YYYY'),
+    average: numFmt(average),
+    expense: numFmt(+expense.value),
+    prediction: numFmt(average * 30),
   };
 }

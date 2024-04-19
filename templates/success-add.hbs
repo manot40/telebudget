@@ -1,10 +1,16 @@
+{{#if id}}
 <b>Transaction added</b>
 
+{{/if}}
 {{#if expense}}
-Your total expense this period is <b>{{ expense }}</b>
+<b>Expense This Period</b>
+Total: {{ expense }}
+Average: {{ average }}
+You would spend about <b>{{ prediction }}</b> until {{ end }}.
+
 {{/if}}
 {{#if budget}}
 You have <b>{{ budget }}</b> remaining to be used.
-{{/if}}
 
+{{/if}}
 {{#if id}}<code>{{ id }}</code>{{/if}}

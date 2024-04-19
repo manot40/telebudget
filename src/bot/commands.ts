@@ -102,5 +102,12 @@ bot.command(['delete', 'd'], async (ctx) => {
   }
 });
 
+bot.command(['sum', 'summary'], async (ctx) => {
+  const report = await getQuickSummary(ctx.session.user);
+  if (report === null) return ctx.reply('No expense found');
+  const template = await loadTemplate('success-add', report);
+  return ctx.replyWithHTML(template);
+});
+
 const HELP = await loadTemplate('help');
 const HELP_ADD = await loadTemplate('help-add');
