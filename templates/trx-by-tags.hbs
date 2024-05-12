@@ -1,0 +1,6 @@
+{{#if tags.length}}
+<b>Highest Spending by Tags</b>
+{{#each tags}}
+{{#if tag}}{{tag}}{{else}}<i>Untagged</i>{{/if}}: {{value}}
+{{/each}}
+{{/if}}

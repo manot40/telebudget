@@ -5,7 +5,7 @@ import { and, eq } from 'drizzle-orm';
 import { transaction$ } from '~/db/schema';
 
 // Services
-import { getQuickSummary } from '~/services/reporting';
+import { getQuickSummary, mostSpentTags } from '~/services/reporting';
 import { parseTransaction, transactionExist } from '~/services/transaction';
 
 // Utilities
@@ -105,7 +105,12 @@ bot.command(['delete', 'd'], async (ctx) => {
 bot.command(['sum', 'summary'], async (ctx) => {
   const report = await getQuickSummary(ctx.session.user);
   if (report === null) return ctx.reply('No expense found');
-  const template = await loadTemplate('success-add', report);
+  const tags = await mostSpentTags(ctx.session.user);
+
+  const template = [await loadTemplate('success-add', report), await loadTemplate('trx-by-tags', { tags })]
+    .join('\n\n')
+    .trim();
+
   return ctx.replyWithHTML(template);
 });
 
